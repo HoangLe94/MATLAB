@@ -1,0 +1,46 @@
+clear all; clc;
+
+%Analyze automatically parameters of arrival
+%Good
+
+f = 25; %frequency in GHz
+%t = 0:0.25:1; %time sampling in ns
+%A = 1 ; %amplitude in m
+
+c = 3e8 ; %speed of light in m/s
+
+Pos_x = 0:1:5; %position of elements of antenna array
+Pos_z = 0:1:7; %position of elements of antenna array
+
+omega = 2*pi*f;
+lambda = c/(f*10^9); %wavelength in m
+
+Delta = lambda/2; %distance between 2 elements in m
+
+s = [10];
+SNR = db2pow(inf);
+
+theta_DOA = [30];
+phi_DOA = [45];
+
+for i = 1:length(Pos_x)
+    for j = 1:length(Pos_z)
+        A(i,j) = exp(-2*pi*1j/lambda*Delta*(Pos_x(i)*cos(deg2rad(theta_DOA))) + Pos_z(j)*sin(deg2rad(theta_DOA))*cos(deg2rad(phi_DOA)));
+    end
+end
+
+for i = 1:length(theta_DOA)
+    mu_DOA = -2*pi/lambda*Delta*cos(deg2rad(theta_DOA(i)))*sin(deg2rad(phi_DOA(i)))*Pos_x';
+    a_mu_DOA(:,i) = transpose(exp(1j*mu_DOA));
+    
+    nu_DOA = -2*pi/lambda*Delta*sin(deg2rad(theta_DOA(i)))*sin(deg2rad(phi_DOA(i)))*Pos_y';
+    a_nu_DOA(:,i) = transpose(exp(1j*nu_DOA)); 
+end
+
+a = a_mu_DOA*
+
+x = awgn(A*s, SNR, 'measured');
+
+R = x*x';
+
+
